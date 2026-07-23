@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Base64 스튜디오 — 다중 문자셋 인코더 · 디코더</title>
+<title>BASE64</title>
 <meta name="description" content="UTF-8, EUC-KR, Shift_JIS, GBK 등 다양한 문자셋을 지원하는 Base64 인코더/디코더. 브라우저에서만 동작하며 서버로 데이터를 전송하지 않습니다.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -76,16 +76,6 @@ body {
 .wordmark .wm-64 {
   color: var(--signal);
 }
-.wordmark .wm-suffix {
-  margin-left: 10px;
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.4em;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  align-self: center;
-}
 
 .subtitle {
   color: var(--ink-soft);
@@ -129,12 +119,12 @@ body {
 .tab-indicator {
   position: absolute;
   top: 4px;
-  left: 4px;
+  left: 0;
   height: calc(100% - 8px);
-  width: 130px;
+  width: 0;
   background: var(--ink);
   border-radius: calc(var(--radius-l) - 4px);
-  transition: transform 0.28s cubic-bezier(.65,0,.35,1);
+  transition: transform 0.28s cubic-bezier(.65,0,.35,1), width 0.28s cubic-bezier(.65,0,.35,1);
 }
 
 /* ---------- panel ---------- */
@@ -333,82 +323,6 @@ textarea::placeholder { color: var(--ink-faint); }
 
 .error-banner.visible { display: flex; }
 
-/* ---------- codebook ---------- */
-
-.codebook {
-  margin-top: 22px;
-  padding: 18px 20px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-l);
-}
-
-.codebook-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 12px;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.codebook-title {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--ink-faint);
-}
-
-.codebook-desc {
-  font-size: 12.5px;
-  color: var(--ink-faint);
-}
-
-.codebook-grid {
-  display: grid;
-  grid-template-columns: repeat(16, 1fr);
-  gap: 4px;
-}
-
-.cb-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 1;
-  border-radius: 3px;
-  background: var(--paper);
-  border: 1px solid var(--paper-line);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--ink-faint);
-  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
-}
-
-.cb-cell.lit {
-  background: var(--signal-soft);
-  border-color: var(--signal-line);
-  color: var(--signal);
-  font-weight: 700;
-  transform: translateY(-1px);
-}
-
-.cb-pad {
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--ink-faint);
-}
-
-.cb-pad .cb-cell {
-  width: 24px;
-  aspect-ratio: auto;
-  height: 24px;
-}
-
 /* ---------- footer ---------- */
 
 .foot {
@@ -428,9 +342,6 @@ textarea::placeholder { color: var(--ink-faint); }
     transform: rotate(90deg);
     padding: 6px 0;
   }
-  .codebook-grid {
-    grid-template-columns: repeat(8, 1fr);
-  }
   .field { min-width: 140px; flex: 1 1 140px; }
 }
 
@@ -445,7 +356,7 @@ textarea::placeholder { color: var(--ink-faint); }
 
   <header class="hero">
     <div class="wordmark">
-      <span class="wm-base">BASE</span><span class="wm-64">64</span><span class="wm-suffix">스튜디오</span>
+      <span class="wm-base">BASE</span><span class="wm-64">64</span>
     </div>
     <p class="subtitle">텍스트와 파일을 다양한 문자셋(UTF-8, EUC-KR, Shift_JIS, GBK 등) 기준으로 Base64로 인코딩하거나 디코딩합니다.</p>
   </header>
@@ -624,19 +535,6 @@ textarea::placeholder { color: var(--ink-faint); }
     <div class="error-banner" id="dec-error" role="alert"></div>
   </section>
 
-  <!-- ===================== CODEBOOK ===================== -->
-  <section class="codebook">
-    <div class="codebook-head">
-      <span class="codebook-title">CODEBOOK · Base64 64문자 색인</span>
-      <span class="codebook-desc">현재 결과에 실제로 사용된 문자가 강조됩니다.</span>
-    </div>
-    <div class="codebook-grid" id="codebook-grid"></div>
-    <div class="cb-pad">
-      <span class="cb-cell" id="cb-pad-cell">=</span>
-      <span>패딩 문자 (길이를 4의 배수로 맞춤)</span>
-    </div>
-  </section>
-
   <p class="foot">모든 변환은 이 브라우저 안에서 실행되며, 입력한 어떤 내용도 서버로 전송되지 않습니다.</p>
 
 </div>
@@ -670,7 +568,6 @@ safe-buffer/index.js:
   'use strict';
 
   var C = window.Base64Codec;
-  var ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
   // ---------- tabs ----------
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
@@ -680,11 +577,17 @@ safe-buffer/index.js:
     decode: document.getElementById('panel-decode'),
   };
 
+  function moveIndicatorTo(tabEl) {
+    if (!tabEl) return;
+    indicator.style.width = tabEl.offsetWidth + 'px';
+    indicator.style.transform = 'translateX(' + tabEl.offsetLeft + 'px)';
+  }
+
   function selectTab(name) {
     tabs.forEach(function (t) {
       var active = t.dataset.tab === name;
       t.setAttribute('aria-selected', active ? 'true' : 'false');
-      if (active) indicator.style.transform = 'translateX(' + t.offsetLeft + 'px)';
+      if (active) moveIndicatorTo(t);
     });
     Object.keys(panels).forEach(function (key) {
       panels[key].hidden = key !== name;
@@ -698,32 +601,8 @@ safe-buffer/index.js:
   });
   window.addEventListener('resize', function () {
     var active = tabs.find(function (t) { return t.getAttribute('aria-selected') === 'true'; });
-    if (active) indicator.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+    moveIndicatorTo(active);
   });
-
-  // ---------- codebook ----------
-  var cbGrid = document.getElementById('codebook-grid');
-  var cbPad = document.getElementById('cb-pad-cell');
-  ALPHABET.split('').forEach(function (ch) {
-    var span = document.createElement('span');
-    span.className = 'cb-cell';
-    span.textContent = ch;
-    span.dataset.char = ch;
-    cbGrid.appendChild(span);
-  });
-  var cbCells = {};
-  Array.prototype.slice.call(cbGrid.children).forEach(function (el) {
-    cbCells[el.dataset.char] = el;
-  });
-
-  function updateCodebook(str) {
-    var present = {};
-    (str || '').split('').forEach(function (ch) { present[ch] = true; });
-    Object.keys(cbCells).forEach(function (ch) {
-      cbCells[ch].classList.toggle('lit', !!present[ch]);
-    });
-    cbPad.classList.toggle('lit', /=/.test(str || ''));
-  }
 
   // ---------- helpers ----------
   function debounce(fn, ms) {
@@ -787,7 +666,6 @@ safe-buffer/index.js:
         encOutput.value = b64;
         encMetaIn.textContent = activeFile.name + ' · ' + bytesLabel(activeFile.bytes.length);
         encMetaOut.textContent = charsLabel(b64.length);
-        updateCodebook(b64);
         return;
       }
       var text = encInput.value;
@@ -795,7 +673,6 @@ safe-buffer/index.js:
         encOutput.value = '';
         encMetaIn.textContent = bytesLabel(0);
         encMetaOut.textContent = charsLabel(0);
-        updateCodebook('');
         return;
       }
       var byteLen = C.byteLengthOfText(text, encCharset.value);
@@ -803,11 +680,9 @@ safe-buffer/index.js:
       encOutput.value = out;
       encMetaIn.textContent = charsLabel(text.length) + ' · ' + bytesLabel(byteLen);
       encMetaOut.textContent = charsLabel(out.length);
-      updateCodebook(out);
     } catch (e) {
       encOutput.value = '';
       encMetaOut.textContent = charsLabel(0);
-      updateCodebook('');
       showEncError('선택한 문자셋으로 변환할 수 없는 문자가 포함되어 있습니다. 다른 문자셋을 선택해 보세요.');
     }
   }
@@ -863,7 +738,6 @@ safe-buffer/index.js:
   function runDecode() {
     showDecError(null);
     var raw = decInput.value;
-    updateCodebook(raw);
     if (raw.trim() === '') {
       decOutput.value = '';
       decMetaIn.textContent = charsLabel(0);
@@ -912,7 +786,6 @@ safe-buffer/index.js:
   });
 
   // ---------- init ----------
-  encInput.value = '안녕하세요! Base64로 변환해 보세요.';
   runEncode();
   runDecode();
   selectTab('encode');
